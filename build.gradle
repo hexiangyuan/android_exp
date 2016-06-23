@@ -1,0 +1,42 @@
+ext {
+    configuration = [
+            applicationId    : "com.daigou.selfstation_new",
+            buildToolsVersion: "23.0.2",
+            compileVersion   : 23,
+            minSdk           : 14,
+            targetSdk        : 23,
+            version_code     : 392,
+            version_name     : "3.9.2",
+    ]
+
+    libraries = [
+            supportVersion    : "23.1.0",
+            volleyVersion     : "1.0.19",
+            gsonVersion       : "2.4",
+            qiqiuVersion      : "7.0.8",
+            rpcVersion        : 269,
+            pgyerVersion      : "2.2.2",
+    ]
+}
+
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.1.0'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        maven { url "https://raw.githubusercontent.com/Pgyer/mvn_repo_pgyer/master" }
+        maven { url 'http://192.168.199.65/' }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

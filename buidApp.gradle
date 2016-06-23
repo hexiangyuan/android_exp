@@ -1,0 +1,102 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
+
+def cfg = rootProject.ext.configuration // 配置
+def libs = rootProject.ext.libraries // 库
+
+android {
+    compileSdkVersion cfg.compileVersion
+    buildToolsVersion cfg.buildToolsVersion
+
+    defaultConfig {
+        applicationId cfg.applicationId
+        minSdkVersion cfg.minSdk
+        targetSdkVersion cfg.targetSdk
+        versionCode cfg.version_code
+        versionName cfg.version_name
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    signingConfigs {
+        release {
+            keyAlias '65daigou'
+            keyPassword '65daigou'
+            storeFile file('../EZDevlivery.jks')
+            storePassword '65daigou'
+        }
+        debug {
+
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources true
+            proguardFile 'proguard-project.txt'
+            resValue "string", "app_name", "ezDelivery"
+        }
+        debug {
+            signingConfig signingConfigs.debug
+            applicationIdSuffix '.debug'
+            resValue "string", "app_name", "ezDelivery_debug"
+
+        }
+    }
+
+    productFlavors {
+
+    }
+
+    applicationVariants.all { variant ->
+        def buildNumber = System.getenv("BUILD_NUMBER")
+        def jenkinsBuild = buildNumber != null ? buildNumber : "0";
+        if (jenkinsBuild != '0') {
+            variant.outputs.each { output ->
+                def file = output.outputFile;
+                if (file != null && output.zipAlign) {
+                    def fileName = "ezdelivery-v${cfg.version_name}-${variant.buildType.name}-jenkins_${jenkinsBuild}.apk".toLowerCase()
+                    output.outputFile = new File(file.parent, fileName)
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile project(':zxing')
+    compile "com.android.support:design:${libs.supportVersion}"
+    compile "com.android.support:appcompat-v7:${libs.supportVersion}"
+    compile "com.android.support:recyclerview-v7:${libs.supportVersion}"
+    compile "com.android.support:cardview-v7:${libs.supportVersion}"
+    compile "com.mcxiaoke.volley:library:${libs.volleyVersion}"
+    compile "com.google.code.gson:gson:${libs.gsonVersion}"
+    compile "com.qiniu:qiniu-android-sdk:${libs.qiqiuVersion}"
+    // RPC & WebApi
+    compile "com.ezbuy.android:rpc-library:jenkins-${libs.rpcVersion}"
+    //PGY 自动更新服务
+    compile "com.pgyersdk:sdk:${libs.pgyerVersion}"
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.7@aar') {
+        transitive = true;
+    }
+}
