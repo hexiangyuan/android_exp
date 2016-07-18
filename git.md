@@ -10,3 +10,7 @@
 `git push origin [tagname]`  //推送指定tag到远程
 
 `git push origin --tags`    //推送所有的tag到远程
+
+### git 重命名一个分支
+
+`git branch -m feature/fixBug`
